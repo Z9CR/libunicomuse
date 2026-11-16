@@ -1,0 +1,79 @@
+# libunicomuse
+
+`libunicomuse` is a C99 computer-use library for Windows, Linux (X11 and
+Wayland), macOS, and FreeBSD. It provides mouse movement, buttons and wheel
+control, and polls whether keys are currently held in the active desktop
+session. Keyboard polling is non-blocking; it does not record key events or
+inject key presses.
+
+## Build
+
+```sh
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build
+cmake --install build
+```
+
+On Linux, CMake uses X11/XTEST when available. X11 calls need a valid
+`DISPLAY`; under Wayland, the native `/dev/uinput` backend is used and the
+process needs root privileges (or equivalent device permissions). Install
+X11 development files including XTEST to enable the X11 backend. On FreeBSD,
+the X11/XTEST development libraries and a running X server are required.
+The Linux native backend queries screen size from `/dev/fb0` when possible
+(otherwise it uses 1920x1080), and its relative movement tracking cannot
+observe cursor movement performed by other applications.
+
+On macOS, grant the calling application Accessibility permission to inject
+input. Windows uses the system input APIs.
+
+## API
+
+Include `<unicomuse/mouse.h>` for mouse APIs and
+`<unicomuse/key.h>` for keyboard APIs. Call `ucomuse_init()` once before using
+the other functions. Call `ucomuse_shutdown()` when finished; it closes
+library-owned OS handles. There are no caller-allocated objects or resources
+to free.
+
+Mouse coordinates are screen pixels, with `(0, 0)` at the primary display's
+top-left. Positive angles rotate clockwise from rightward, and wheel notches
+are positive magnitudes whose direction is specified separately. Smooth
+movement duration is in milliseconds.
+
+```c
+#include <unicomuse/key.h>
+#include <unicomuse/mouse.h>
+
+int main(void)
+{
+    ucomuse_key key;
+    int pressed;
+
+    if (ucomuse_init() != UCOMUSE_STATUS_OK) {
+        return 1;
+    }
+
+    ucomuse_mouse_move_to(500, 300, 250);
+    ucomuse_mouse_click(UCOMUSE_MOUSE_LEFT);
+    if (ucomuse_key_is_pressed(UCOMUSE_KEY_LEFT_CONTROL, &pressed) ==
+            UCOMUSE_STATUS_OK && pressed) {
+        ucomuse_key_get_pressed(&key);
+    }
+
+    ucomuse_shutdown();
+    return 0;
+}
+```
+
+Every operation returns a `ucomuse_status`; check it to detect OS or permission
+errors. Key polling is non-blocking and reports current key state, not key
+events. When multiple keys are held, `ucomuse_key_get_pressed()` returns one
+key in backend-defined scan order.
+The API uses process-wide backend state; callers should serialize concurrent
+operations and must not call `ucomuse_shutdown()` while another operation is
+running.
+
+## Multi-device behavior
+
+The API does not let callers select a physical keyboard or mouse. Key-state
+queries report held keys across the active session, while mouse actions are
+sent through the platform's active input backend.
