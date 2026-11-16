@@ -6,6 +6,23 @@
 
 static int g_library_initialized = 0;
 
+static int ucomuse_is_valid_key(ucomuse_key key)
+{
+    return key == UCOMUSE_KEY_SPACE || key == UCOMUSE_KEY_APOSTROPHE ||
+           (key >= UCOMUSE_KEY_COMMA && key <= UCOMUSE_KEY_SLASH) ||
+           (key >= UCOMUSE_KEY_0 && key <= UCOMUSE_KEY_9) ||
+           key == UCOMUSE_KEY_SEMICOLON || key == UCOMUSE_KEY_EQUAL ||
+           (key >= UCOMUSE_KEY_A && key <= UCOMUSE_KEY_Z) ||
+           (key >= UCOMUSE_KEY_LEFT_BRACKET &&
+            key <= UCOMUSE_KEY_RIGHT_BRACKET) ||
+           key == UCOMUSE_KEY_GRAVE ||
+           (key >= UCOMUSE_KEY_ESCAPE && key <= UCOMUSE_KEY_END) ||
+           (key >= UCOMUSE_KEY_CAPS_LOCK && key <= UCOMUSE_KEY_PAUSE) ||
+           (key >= UCOMUSE_KEY_F1 && key <= UCOMUSE_KEY_F12) ||
+           (key >= UCOMUSE_KEY_KP_0 && key <= UCOMUSE_KEY_KP_EQUAL) ||
+           (key >= UCOMUSE_KEY_LEFT_SHIFT && key <= UCOMUSE_KEY_MENU);
+}
+
 ucomuse_status ucomuse_init(void)
 {
     ucomuse_status status;
@@ -158,7 +175,7 @@ ucomuse_status ucomuse_mouse_wheel(ucomuse_wheel_direction direction,
     }
     if ((direction != UCOMUSE_WHEEL_UP && direction != UCOMUSE_WHEEL_DOWN) ||
         !isfinite(notches) || notches < 0.0 ||
-        notches > (double)INT_MAX) {
+        notches > (double)UCOMUSE_MAX_WHEEL_NOTCHES) {
         return UCOMUSE_STATUS_INVALID_ARGUMENT;
     }
     if (notches == 0.0) {
@@ -190,7 +207,7 @@ ucomuse_status ucomuse_key_is_pressed(ucomuse_key key, int *pressed)
     if (!g_library_initialized) {
         return UCOMUSE_STATUS_NOT_INITIALIZED;
     }
-    if (pressed == NULL || key <= UCOMUSE_KEY_NONE) {
+    if (pressed == NULL || !ucomuse_is_valid_key(key)) {
         return UCOMUSE_STATUS_INVALID_ARGUMENT;
     }
     return ucomuse_platform_key_pressed(key, pressed);

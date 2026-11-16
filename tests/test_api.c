@@ -45,25 +45,43 @@ int main(void)
         fake_wheel != -2) {
         return 9;
     }
+    if (ucomuse_mouse_wheel(UCOMUSE_WHEEL_UP,
+                            (double)UCOMUSE_MAX_WHEEL_NOTCHES) !=
+            UCOMUSE_STATUS_OK ||
+        fake_wheel != UCOMUSE_MAX_WHEEL_NOTCHES) {
+        return 10;
+    }
+    if (ucomuse_mouse_wheel(UCOMUSE_WHEEL_UP,
+                            (double)UCOMUSE_MAX_WHEEL_NOTCHES + 1.0) !=
+            UCOMUSE_STATUS_INVALID_ARGUMENT ||
+        fake_wheel != UCOMUSE_MAX_WHEEL_NOTCHES) {
+        return 11;
+    }
     if (ucomuse_mouse_click(UCOMUSE_MOUSE_X1) != UCOMUSE_STATUS_OK ||
         fake_button != UCOMUSE_MOUSE_X1 || fake_button_down != 0 ||
         fake_button_calls != 2) {
-        return 10;
+        return 12;
     }
     fake_key = UCOMUSE_KEY_LEFT_CONTROL;
     if (ucomuse_key_is_pressed(fake_key, &pressed) != UCOMUSE_STATUS_OK ||
         !pressed ||
         ucomuse_key_get_pressed(&key) != UCOMUSE_STATUS_OK ||
         key != fake_key) {
-        return 11;
+        return 13;
     }
     if (ucomuse_key_is_pressed(fake_key, NULL) !=
         UCOMUSE_STATUS_INVALID_ARGUMENT) {
-        return 12;
+        return 14;
+    }
+    pressed = 1;
+    if (ucomuse_key_is_pressed((ucomuse_key)33, &pressed) !=
+            UCOMUSE_STATUS_INVALID_ARGUMENT ||
+        pressed != 1) {
+        return 15;
     }
     ucomuse_shutdown();
     if (ucomuse_key_get_pressed(&key) != UCOMUSE_STATUS_NOT_INITIALIZED) {
-        return 13;
+        return 16;
     }
     return 0;
 }

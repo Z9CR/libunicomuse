@@ -37,7 +37,7 @@
 | `UCOMUSE_STATUS_OK` | 操作成功。 |
 | `UCOMUSE_STATUS_ERROR` | 后端或操作系统操作失败，例如无法连接显示服务器、访问输入设备或发送输入。 |
 | `UCOMUSE_STATUS_NOT_INITIALIZED` | 尚未成功调用 `ucomuse_init()`，或已经调用 `ucomuse_shutdown()`。 |
-| `UCOMUSE_STATUS_INVALID_ARGUMENT` | 参数不合法，例如空输出指针、无效按钮或方向、非有限角度/滚轮量。 |
+| `UCOMUSE_STATUS_INVALID_ARGUMENT` | 参数不合法，例如空输出指针、无效按钮、方向或按键、非有限角度/滚轮量。 |
 | `UCOMUSE_STATUS_NOT_SUPPORTED` | 当前后端无法查询指定按键或不支持该能力。 |
 
 检查返回值；不要把失败当作操作成功。键盘查询中的 `pressed` 输出值只有在
@@ -98,8 +98,8 @@
 | `UCOMUSE_WHEEL_UP` | 向上滚动。 |
 | `UCOMUSE_WHEEL_DOWN` | 向下滚动。 |
 
-滚轮量必须是有限的非负数；不足一个刻度的正数会被提升为一个刻度，
-其他数值按最近整数取整。
+滚轮量必须是 0 到 `UCOMUSE_MAX_WHEEL_NOTCHES`（1000）之间的有限数；
+不足一个刻度的正数会被提升为一个刻度，其他数值按最近整数取整。
 
 ### `ucomuse_key`
 
@@ -204,8 +204,9 @@ ucomuse_mouse_move_to(500, 300, 250);
 滚动鼠标滚轮。
 
 - `direction`：`UCOMUSE_WHEEL_UP` 或 `UCOMUSE_WHEEL_DOWN`。
-- `notches`：非负滚轮刻度数，必须是有限值且不大于 `INT_MAX`。0 表示不发送
-  滚动事件；大于 0 且小于 0.5 的值至少发送一个刻度，其余值按最近整数取整。
+- `notches`：0 到 `UCOMUSE_MAX_WHEEL_NOTCHES`（1000）之间的有限滚轮刻度数。
+  0 表示不发送滚动事件；大于 0 且小于 0.5 的值至少发送一个刻度，其余值
+  按最近整数取整。
 - 返回：方向或数值不合法时为 `INVALID_ARGUMENT`，否则为后端执行状态。
 
 ## 键盘函数
@@ -223,7 +224,7 @@ ucomuse_mouse_move_to(500, 300, 250);
 
 查询指定按键当前是否被按住。
 
-- `key`：有效的 `ucomuse_key`，不能为 `UCOMUSE_KEY_NONE`。
+- `key`：`ucomuse_key` 中定义的有效值，不能为 `UCOMUSE_KEY_NONE`。
 - `pressed`：必需的非空输出指针。成功时写入 `1`（按下）或 `0`（未按下）。
 - 返回：无效输入时为 `INVALID_ARGUMENT`；后端无法映射该按键时可能返回
   `NOT_SUPPORTED`；否则返回实际查询状态。

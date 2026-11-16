@@ -43,7 +43,7 @@ Every public function except `ucomuse_shutdown()` returns `ucomuse_status`:
 | `UCOMUSE_STATUS_OK` | The operation succeeded. |
 | `UCOMUSE_STATUS_ERROR` | The backend or OS operation failed, for example because a display server, input device, or event injection operation was unavailable. |
 | `UCOMUSE_STATUS_NOT_INITIALIZED` | `ucomuse_init()` has not succeeded, or `ucomuse_shutdown()` has already been called. |
-| `UCOMUSE_STATUS_INVALID_ARGUMENT` | An argument is invalid, such as a null output pointer, invalid button or direction, or a non-finite angle or wheel amount. |
+| `UCOMUSE_STATUS_INVALID_ARGUMENT` | An argument is invalid, such as a null output pointer, invalid button, direction, or key, or a non-finite angle or wheel amount. |
 | `UCOMUSE_STATUS_NOT_SUPPORTED` | The active backend cannot query the requested key or does not support the requested capability. |
 
 Check return values; do not treat a failed operation as successful. The
@@ -112,9 +112,9 @@ Scroll direction accepted by the wheel function:
 | `UCOMUSE_WHEEL_UP` | Scroll upward. |
 | `UCOMUSE_WHEEL_DOWN` | Scroll downward. |
 
-Wheel amounts must be finite and nonnegative. A positive amount that rounds
-to zero is promoted to one notch; other values are rounded to the nearest
-integer.
+Wheel amounts must be finite and between zero and
+`UCOMUSE_MAX_WHEEL_NOTCHES` (1000). A positive amount that rounds to zero is
+promoted to one notch; other values are rounded to the nearest integer.
 
 ### `ucomuse_key`
 
@@ -228,9 +228,10 @@ enumeration return `UCOMUSE_STATUS_INVALID_ARGUMENT`.
 Scrolls the mouse wheel.
 
 - `direction`: `UCOMUSE_WHEEL_UP` or `UCOMUSE_WHEEL_DOWN`.
-- `notches`: finite, nonnegative number of notches, no greater than `INT_MAX`.
-  Zero sends no event. A positive value that rounds to zero sends one notch;
-  other values are rounded to the nearest integer.
+- `notches`: finite number of notches between zero and
+  `UCOMUSE_MAX_WHEEL_NOTCHES` (1000). Zero sends no event. A positive value
+  that rounds to zero sends one notch; other values are rounded to the nearest
+  integer.
 - Returns `INVALID_ARGUMENT` for an invalid direction or amount; otherwise
   returns the backend operation status.
 
@@ -250,7 +251,8 @@ Queries one key that is currently held.
 
 Queries whether the specified key is currently held.
 
-- `key`: a valid `ucomuse_key`, other than `UCOMUSE_KEY_NONE`.
+- `key`: one of the defined `ucomuse_key` values, other than
+  `UCOMUSE_KEY_NONE`.
 - `pressed`: required non-null output pointer. On success, writes `1` when
   held or `0` when not held.
 - Returns `INVALID_ARGUMENT` for invalid input. Returns `NOT_SUPPORTED` if

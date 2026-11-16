@@ -21,6 +21,8 @@ typedef enum ucomuse_wheel_direction {
     UCOMUSE_WHEEL_DOWN = 1
 } ucomuse_wheel_direction;
 
+#define UCOMUSE_MAX_WHEEL_NOTCHES 1000
+
 /* Move to screen coordinates (origin at the primary display's top-left).
  * time_ms == 0 performs an immediate move; otherwise movement is smoothed.
  */
@@ -31,6 +33,7 @@ ucomuse_status ucomuse_mouse_translate(double angle_degrees, int32_t distance,
 ucomuse_status ucomuse_mouse_click(ucomuse_mouse_button button);
 ucomuse_status ucomuse_mouse_press(ucomuse_mouse_button button);
 ucomuse_status ucomuse_mouse_release(ucomuse_mouse_button button);
+/* notches must be finite and between 0 and UCOMUSE_MAX_WHEEL_NOTCHES. */
 ucomuse_status ucomuse_mouse_wheel(ucomuse_wheel_direction direction,
                                    double notches);
 
