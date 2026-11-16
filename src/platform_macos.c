@@ -2,6 +2,7 @@
 #include "internal.h"
 
 #include <ApplicationServices/ApplicationServices.h>
+#include <CoreFoundation/CoreFoundation.h>
 #include <CoreGraphics/CoreGraphics.h>
 #include <limits.h>
 #include <math.h>
@@ -105,6 +106,23 @@ static ucomuse_status ucomuse_cursor(CGPoint *point)
 
 ucomuse_status ucomuse_platform_init(void)
 {
+    CFMutableDictionaryRef options;
+
+    if (AXIsProcessTrusted()) {
+        g_initialized = 1;
+        return UCOMUSE_STATUS_OK;
+    }
+
+    options = CFDictionaryCreateMutable(
+        kCFAllocatorDefault, 1, &kCFTypeDictionaryKeyCallBacks,
+        &kCFTypeDictionaryValueCallBacks);
+    if (options == NULL) {
+        return UCOMUSE_STATUS_ERROR;
+    }
+    CFDictionarySetValue(options, kAXTrustedCheckOptionPrompt, kCFBooleanTrue);
+    (void)AXIsProcessTrustedWithOptions(options);
+    CFRelease(options);
+
     if (!AXIsProcessTrusted()) {
         return UCOMUSE_STATUS_ERROR;
     }

@@ -15,10 +15,22 @@ static int report_error(const char *operation, ucomuse_status status)
 int main(void)
 {
     ucomuse_key key;
+    ucomuse_status status;
     int pressed;
     int result = 1;
 
-    if (report_error("ucomuse_init", ucomuse_init())) {
+    status = ucomuse_init();
+    if (report_error("ucomuse_init", status)) {
+#if defined(__APPLE__)
+        fprintf(stderr,
+                "Grant Accessibility permission to this app in System "
+                "Settings > Privacy & Security > Accessibility, then relaunch "
+                "it.\n");
+#elif defined(__linux__)
+        fprintf(stderr,
+                "On Wayland, ensure this process can access /dev/uinput "
+                "(typically by running it as root).\n");
+#endif
         return result;
     }
 

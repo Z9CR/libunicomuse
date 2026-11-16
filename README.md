@@ -30,8 +30,9 @@ The Linux native backend queries screen size from `/dev/fb0` when possible
 (otherwise it uses 1920x1080), and its relative movement tracking cannot
 observe cursor movement performed by other applications.
 
-On macOS, grant the calling application Accessibility permission to inject
-input. Windows uses the system input APIs.
+On macOS, initialization requests Accessibility permission if needed. Grant
+permission to the calling application in System Settings > Privacy & Security
+> Accessibility, then relaunch it. Windows uses the system input APIs.
 
 ## API
 

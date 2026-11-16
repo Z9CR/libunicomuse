@@ -23,6 +23,7 @@ if(WIN32)
 elseif(APPLE)
     target_sources(unicomuse PRIVATE src/platform_macos.c)
     target_link_libraries(unicomuse PRIVATE
+        "-framework CoreFoundation"
         "-framework CoreGraphics"
         "-framework ApplicationServices"
     )
