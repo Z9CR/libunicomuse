@@ -60,7 +60,9 @@ In all other translation units, include the header without defining the macro.
 The header can also be generated from the source with
 `python3 scripts/amalgamate.py`; GitHub Actions checks that the committed
 header matches the implementation and publishes it as a workflow artifact and
-as `unicomuse.h` on GitHub Releases. On Linux, the single-header build uses
+as `unicomuse.h` on GitHub Releases. Every push to `main` creates a pre-release
+tagged with that commit's SHA and attaches the single header after all
+cross-platform checks pass. On Linux, the single-header build uses
 the native `/dev/uinput` backend by default; define `UCOMUSE_USE_X11` in the
 implementation translation unit and link X11/XTEST to enable the X11 backend.
 When compiling manually, link `-lm` on Linux/FreeBSD; macOS also requires the

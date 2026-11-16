@@ -56,3 +56,32 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh release upload "${GITHUB_REF_NAME}" single_include/unicomuse.h --clobber
+
+  publish-main-prerelease:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - name: Generate single header
+        run: python scripts/amalgamate.py
+      - name: Create or update commit pre-release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG_NAME: main-${{ github.sha }}
+          RELEASE_TITLE: Main build ${{ github.sha }}
+        run: |
+          if gh release view "$TAG_NAME" >/dev/null 2>&1; then
+            gh release upload "$TAG_NAME" single_include/unicomuse.h --clobber
+          else
+            gh release create "$TAG_NAME" single_include/unicomuse.h \
+              --title "$RELEASE_TITLE" \
+              --notes "Automated pre-release from main commit ${GITHUB_SHA}." \
+              --prerelease \
+              --target "$GITHUB_SHA"
+          fi

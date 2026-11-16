@@ -55,7 +55,9 @@ target_link_libraries(my_app PRIVATE unicomuse::unicomuse)
 其他翻译单元只包含头文件，不定义该宏。也可以通过
 `python3 scripts/amalgamate.py` 从源码重新生成。GitHub Actions 会检查提交的
 单头文件是否与源码一致，并将其作为 workflow artifact 发布；GitHub Release
-发布时也会附加名为 `unicomuse.h` 的文件。Linux 单头文件默认使用原生
+发布时也会附加名为 `unicomuse.h` 的文件。每次向 `main` 推送都会在跨平台
+检查通过后，创建一个以提交 SHA 命名的预发布版本并附加此单头文件。Linux
+单头文件默认使用原生
 `/dev/uinput` 后端；如需使用 X11 后端，在实现所在的翻译单元中定义
 `UCOMUSE_USE_X11` 并链接 X11/XTEST。手动编译时，Linux/FreeBSD 需要链接
 `-lm`；macOS 还需要 CoreFoundation、CoreGraphics 和 ApplicationServices
