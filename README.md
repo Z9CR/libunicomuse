@@ -14,6 +14,13 @@ cmake --build build
 cmake --install build
 ```
 
+To build the runnable example, enable it when configuring:
+
+```sh
+cmake -S . -B build -DUCOMUSE_BUILD_EXAMPLES=ON
+cmake --build build --target unicomuse_example
+```
+
 On Linux, CMake uses X11/XTEST when available. X11 calls need a valid
 `DISPLAY`; under Wayland, the native `/dev/uinput` backend is used and the
 process needs root privileges (or equivalent device permissions). Install
@@ -39,30 +46,8 @@ top-left. Positive angles rotate clockwise from rightward, and wheel notches
 are positive magnitudes whose direction is specified separately. Smooth
 movement duration is in milliseconds.
 
-```c
-#include <unicomuse/key.h>
-#include <unicomuse/mouse.h>
-
-int main(void)
-{
-    ucomuse_key key;
-    int pressed;
-
-    if (ucomuse_init() != UCOMUSE_STATUS_OK) {
-        return 1;
-    }
-
-    ucomuse_mouse_move_to(500, 300, 250);
-    ucomuse_mouse_click(UCOMUSE_MOUSE_LEFT);
-    if (ucomuse_key_is_pressed(UCOMUSE_KEY_LEFT_CONTROL, &pressed) ==
-            UCOMUSE_STATUS_OK && pressed) {
-        ucomuse_key_get_pressed(&key);
-    }
-
-    ucomuse_shutdown();
-    return 0;
-}
-```
+See [`example/basic.c`](./example/basic.c) for a runnable example of mouse
+control and keyboard-state queries.
 
 Every operation returns a `ucomuse_status`; check it to detect OS or permission
 errors. Key polling is non-blocking and reports current key state, not key
