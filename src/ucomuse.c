@@ -4,27 +4,27 @@
 #include <math.h>
 #include <stddef.h>
 
-static int g_initialized = 0;
+static int g_library_initialized = 0;
 
 ucomuse_status ucomuse_init(void)
 {
     ucomuse_status status;
 
-    if (g_initialized) {
+    if (g_library_initialized) {
         return UCOMUSE_STATUS_OK;
     }
     status = ucomuse_platform_init();
     if (status == UCOMUSE_STATUS_OK) {
-        g_initialized = 1;
+        g_library_initialized = 1;
     }
     return status;
 }
 
 void ucomuse_shutdown(void)
 {
-    if (g_initialized) {
+    if (g_library_initialized) {
         ucomuse_platform_shutdown();
-        g_initialized = 0;
+        g_library_initialized = 0;
     }
 }
 
@@ -36,7 +36,7 @@ ucomuse_status ucomuse_mouse_move_to(int32_t x, int32_t y, uint32_t time_ms)
     uint32_t i;
     ucomuse_status status;
 
-    if (!g_initialized) {
+    if (!g_library_initialized) {
         return UCOMUSE_STATUS_NOT_INITIALIZED;
     }
     if (time_ms == 0) {
@@ -78,7 +78,7 @@ ucomuse_status ucomuse_mouse_translate(double angle_degrees, int32_t distance,
     uint32_t i;
     const double radians = angle_degrees * 3.14159265358979323846 / 180.0;
 
-    if (!g_initialized) {
+    if (!g_library_initialized) {
         return UCOMUSE_STATUS_NOT_INITIALIZED;
     }
     if (!isfinite(angle_degrees)) {
@@ -129,7 +129,7 @@ ucomuse_status ucomuse_mouse_click(ucomuse_mouse_button button)
 
 ucomuse_status ucomuse_mouse_press(ucomuse_mouse_button button)
 {
-    if (!g_initialized) {
+    if (!g_library_initialized) {
         return UCOMUSE_STATUS_NOT_INITIALIZED;
     }
     if (button < UCOMUSE_MOUSE_LEFT || button > UCOMUSE_MOUSE_X2) {
@@ -140,7 +140,7 @@ ucomuse_status ucomuse_mouse_press(ucomuse_mouse_button button)
 
 ucomuse_status ucomuse_mouse_release(ucomuse_mouse_button button)
 {
-    if (!g_initialized) {
+    if (!g_library_initialized) {
         return UCOMUSE_STATUS_NOT_INITIALIZED;
     }
     if (button < UCOMUSE_MOUSE_LEFT || button > UCOMUSE_MOUSE_X2) {
@@ -153,7 +153,7 @@ ucomuse_status ucomuse_mouse_wheel(ucomuse_wheel_direction direction,
                                    double notches)
 {
     int delta;
-    if (!g_initialized) {
+    if (!g_library_initialized) {
         return UCOMUSE_STATUS_NOT_INITIALIZED;
     }
     if ((direction != UCOMUSE_WHEEL_UP && direction != UCOMUSE_WHEEL_DOWN) ||
@@ -176,7 +176,7 @@ ucomuse_status ucomuse_mouse_wheel(ucomuse_wheel_direction direction,
 
 ucomuse_status ucomuse_key_get_pressed(ucomuse_key *key)
 {
-    if (!g_initialized) {
+    if (!g_library_initialized) {
         return UCOMUSE_STATUS_NOT_INITIALIZED;
     }
     if (key == NULL) {
@@ -187,7 +187,7 @@ ucomuse_status ucomuse_key_get_pressed(ucomuse_key *key)
 
 ucomuse_status ucomuse_key_is_pressed(ucomuse_key key, int *pressed)
 {
-    if (!g_initialized) {
+    if (!g_library_initialized) {
         return UCOMUSE_STATUS_NOT_INITIALIZED;
     }
     if (pressed == NULL || key <= UCOMUSE_KEY_NONE) {

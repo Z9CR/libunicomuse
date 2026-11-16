@@ -44,6 +44,29 @@ Call `ucomuse_init()` before using the API and `ucomuse_shutdown()` when
 finished. See [`example/basic.c`](./example/basic.c) for a complete C usage
 example.
 
+## Single-header use
+
+The generated amalgamated header is available at
+[`single_include/unicomuse.h`](./single_include/unicomuse.h). Include it in
+your project and define `UCOMUSE_IMPLEMENTATION` in exactly one C/C++
+translation unit before including it:
+
+```c
+#define UCOMUSE_IMPLEMENTATION
+#include "unicomuse.h"
+```
+
+In all other translation units, include the header without defining the macro.
+The header can also be generated from the source with
+`python3 scripts/amalgamate.py`; GitHub Actions checks that the committed
+header matches the implementation and publishes it as a workflow artifact and
+as `unicomuse.h` on GitHub Releases. On Linux, the single-header build uses
+the native `/dev/uinput` backend by default; define `UCOMUSE_USE_X11` in the
+implementation translation unit and link X11/XTEST to enable the X11 backend.
+When compiling manually, link `-lm` on Linux/FreeBSD; macOS also requires the
+CoreFoundation, CoreGraphics, and ApplicationServices frameworks. The CMake
+target handles these platform link dependencies automatically.
+
 On Linux, CMake uses X11/XTEST when available. X11 calls need a valid
 `DISPLAY`; under Wayland, the native `/dev/uinput` backend is used and the
 process needs root privileges (or equivalent device permissions). Install

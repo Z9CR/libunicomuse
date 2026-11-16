@@ -192,7 +192,8 @@ ucomuse_status ucomuse_platform_move_by(int32_t dx, int32_t dy)
 ucomuse_status ucomuse_platform_button(ucomuse_mouse_button button, int down)
 {
     static const CGMouseButton buttons[] = {
-        kCGMouseButtonLeft, kCGMouseButtonRight, kCGMouseButtonCenter, 3, 4
+        kCGMouseButtonLeft, kCGMouseButtonRight, kCGMouseButtonCenter,
+        (CGMouseButton)3, (CGMouseButton)4
     };
     CGEventType type;
     CGEventRef event;

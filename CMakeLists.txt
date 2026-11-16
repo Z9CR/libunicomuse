@@ -56,6 +56,9 @@ install(TARGETS unicomuse
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 install(DIRECTORY include/unicomuse DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(FILES single_include/unicomuse.h
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
 
 include(CTest)
 if(BUILD_TESTING)
@@ -74,6 +77,49 @@ if(BUILD_TESTING)
         target_link_libraries(unicomuse_api_test PRIVATE m)
     endif()
     add_test(NAME unicomuse_api_test COMMAND unicomuse_api_test)
+
+    add_executable(unicomuse_single_header_compile
+        tests/single_header_compile.c
+    )
+    target_include_directories(unicomuse_single_header_compile PRIVATE
+        single_include
+    )
+    if(APPLE)
+        target_link_libraries(unicomuse_single_header_compile PRIVATE
+            "-framework CoreFoundation"
+            "-framework CoreGraphics"
+            "-framework ApplicationServices"
+        )
+    elseif(UNIX)
+        target_link_libraries(unicomuse_single_header_compile PRIVATE m)
+    endif()
+    if(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
+        target_link_libraries(unicomuse_single_header_compile PRIVATE
+            X11::X11 X11::Xtst
+        )
+    endif()
+    add_test(NAME unicomuse_single_header_compile
+        COMMAND unicomuse_single_header_compile
+    )
+
+    if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND X11_FOUND AND
+       TARGET X11::Xtst)
+        add_executable(unicomuse_single_header_x11_compile
+            tests/single_header_compile.c
+        )
+        target_include_directories(unicomuse_single_header_x11_compile PRIVATE
+            single_include
+        )
+        target_compile_definitions(unicomuse_single_header_x11_compile PRIVATE
+            UCOMUSE_USE_X11=1
+        )
+        target_link_libraries(unicomuse_single_header_x11_compile PRIVATE
+            X11::X11 X11::Xtst m
+        )
+        add_test(NAME unicomuse_single_header_x11_compile
+            COMMAND unicomuse_single_header_x11_compile
+        )
+    endif()
 endif()
 
 option(UCOMUSE_BUILD_EXAMPLES "Build libunicomuse examples" OFF)

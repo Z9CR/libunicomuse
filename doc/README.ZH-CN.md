@@ -40,6 +40,27 @@ target_link_libraries(my_app PRIVATE unicomuse::unicomuse)
 调用 API 前先调用 `ucomuse_init()`，使用结束后调用 `ucomuse_shutdown()`。
 完整的 C 语言调用示例参见 [`../example/basic.c`](../example/basic.c)。
 
+## 单头文件用法
+
+生成好的单头文件位于
+[`../single_include/unicomuse.h`](../single_include/unicomuse.h)。在项目中
+包含该文件，并在且仅在一个 C 翻译单元中，先定义 `UCOMUSE_IMPLEMENTATION`
+再包含它：
+
+```c
+#define UCOMUSE_IMPLEMENTATION
+#include "unicomuse.h"
+```
+
+其他翻译单元只包含头文件，不定义该宏。也可以通过
+`python3 scripts/amalgamate.py` 从源码重新生成。GitHub Actions 会检查提交的
+单头文件是否与源码一致，并将其作为 workflow artifact 发布；GitHub Release
+发布时也会附加名为 `unicomuse.h` 的文件。Linux 单头文件默认使用原生
+`/dev/uinput` 后端；如需使用 X11 后端，在实现所在的翻译单元中定义
+`UCOMUSE_USE_X11` 并链接 X11/XTEST。手动编译时，Linux/FreeBSD 需要链接
+`-lm`；macOS 还需要 CoreFoundation、CoreGraphics 和 ApplicationServices
+framework。CMake target 会自动传递平台所需的链接依赖。
+
 Linux 上，如果检测到 X11/XTEST，CMake 会启用 X11 后端。X11 后端需要可用
 的 `DISPLAY`。Wayland 会话使用原生 `/dev/uinput` 后端，进程需要 root 权限
 或具有相应设备访问权限。安装包含 XTEST 的 X11 开发文件可启用 X11 后端。
