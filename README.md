@@ -6,6 +6,8 @@ control, and polls whether keys are currently held in the active desktop
 session. Keyboard polling is non-blocking; it does not record key events or
 inject key presses.
 
+[中文版](./doc/README.ZH-CN.md)
+
 ## Build
 
 ```sh
@@ -41,6 +43,9 @@ launched from Terminal, Terminal may also need permission. Relaunch the
 application after granting access.
 
 ## API
+
+See the detailed API documentation: [English](./doc/api.md) /
+[简体中文](./doc/api.zh-CN.md).
 
 Include `<unicomuse/mouse.h>` for mouse APIs and
 `<unicomuse/key.h>` for keyboard APIs. Call `ucomuse_init()` once before using
