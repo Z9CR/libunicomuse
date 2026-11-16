@@ -14,13 +14,6 @@ cmake --build build
 cmake --install build
 ```
 
-To build the runnable example, enable it when configuring:
-
-```sh
-cmake -S . -B build -DUCOMUSE_BUILD_EXAMPLES=ON
-cmake --build build --target unicomuse_example
-```
-
 On Linux, CMake uses X11/XTEST when available. X11 calls need a valid
 `DISPLAY`; under Wayland, the native `/dev/uinput` backend is used and the
 process needs root privileges (or equivalent device permissions). Install
@@ -30,9 +23,22 @@ The Linux native backend queries screen size from `/dev/fb0` when possible
 (otherwise it uses 1920x1080), and its relative movement tracking cannot
 observe cursor movement performed by other applications.
 
-On macOS, initialization requests Accessibility permission if needed. Grant
-permission to the calling application in System Settings > Privacy & Security
-> Accessibility, then relaunch it. Windows uses the system input APIs.
+Windows uses the system input APIs.
+
+## Notes
+
+Build the runnable example by enabling it at configure time:
+
+```sh
+cmake -S . -B build -DUCOMUSE_BUILD_EXAMPLES=ON
+cmake --build build --target unicomuse_example
+```
+
+The example moves and clicks the mouse when run. On macOS, initialization
+requests Accessibility permission if needed. Grant permission to the calling
+application in `System Settings > Privacy & Security > Device Control and Data Access`; if
+launched from Terminal, Terminal may also need permission. Relaunch the
+application after granting access.
 
 ## API
 
