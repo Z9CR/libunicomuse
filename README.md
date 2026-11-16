@@ -16,6 +16,34 @@ cmake --build build
 cmake --install build
 ```
 
+## Use from another CMake project
+
+You do not need to install the headers or library system-wide. Add
+`libunicomuse` to your project as a Git submodule or a vendored source
+directory, then add it with CMake:
+
+```cmake
+cmake_minimum_required(VERSION 3.16)
+project(my_app LANGUAGES C)
+
+add_subdirectory(external/libunicomuse)
+
+add_executable(my_app main.c)
+target_link_libraries(my_app PRIVATE unicomuse::unicomuse)
+```
+
+Replace `external/libunicomuse` with the path where you keep the library.
+The `unicomuse::unicomuse` target supplies the public include directory and
+platform link dependencies, so source files can include
+`<unicomuse/mouse.h>` and `<unicomuse/key.h>` directly. The consuming project
+must enable the C language. This project adds its API test executable when
+`BUILD_TESTING` is enabled (the default); set `-DBUILD_TESTING=OFF` only if you
+intend to disable CTest-based tests for the entire CMake build.
+
+Call `ucomuse_init()` before using the API and `ucomuse_shutdown()` when
+finished. See [`example/basic.c`](./example/basic.c) for a complete C usage
+example.
+
 On Linux, CMake uses X11/XTEST when available. X11 calls need a valid
 `DISPLAY`; under Wayland, the native `/dev/uinput` backend is used and the
 process needs root privileges (or equivalent device permissions). Install

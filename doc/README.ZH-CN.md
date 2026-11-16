@@ -15,6 +15,31 @@ cmake --build build
 cmake --install build
 ```
 
+## 在其他 CMake 项目中使用
+
+不需要把头文件或库安装到系统目录。可以将 `libunicomuse` 作为 Git 子模块
+或 vendored 源码目录放入自己的项目，再通过 CMake 添加：
+
+```cmake
+cmake_minimum_required(VERSION 3.16)
+project(my_app LANGUAGES C)
+
+add_subdirectory(external/libunicomuse)
+
+add_executable(my_app main.c)
+target_link_libraries(my_app PRIVATE unicomuse::unicomuse)
+```
+
+将 `external/libunicomuse` 替换为你存放库源码的实际路径。
+`unicomuse::unicomuse` target 会传递公共头文件目录和平台链接依赖，因此
+源文件可以直接包含 `<unicomuse/mouse.h>` 和 `<unicomuse/key.h>`。使用项目
+必须启用 C 语言。本项目在启用 `BUILD_TESTING` 时（默认启用）会添加 API
+测试程序。只有在你希望关闭整个 CMake 构建中的 CTest 测试时，才设置
+`-DBUILD_TESTING=OFF`。
+
+调用 API 前先调用 `ucomuse_init()`，使用结束后调用 `ucomuse_shutdown()`。
+完整的 C 语言调用示例参见 [`../example/basic.c`](../example/basic.c)。
+
 Linux 上，如果检测到 X11/XTEST，CMake 会启用 X11 后端。X11 后端需要可用
 的 `DISPLAY`。Wayland 会话使用原生 `/dev/uinput` 后端，进程需要 root 权限
 或具有相应设备访问权限。安装包含 XTEST 的 X11 开发文件可启用 X11 后端。
